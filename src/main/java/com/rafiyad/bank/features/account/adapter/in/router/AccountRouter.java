@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.server.*;
 @Configuration
 public class AccountRouter {
     private String baseUrl = "/api/v1/accounts";
-    private String id = "/{id}";
+    private String id = "/{accountNumber}";
 
     @Bean
     public RouterFunction<ServerResponse> route(AccountHandler accountHandler) {
@@ -18,6 +18,7 @@ public class AccountRouter {
                 .nest(RequestPredicates.accept(MediaType.APPLICATION_JSON),
                         builder -> builder
                                 .GET(baseUrl, accountHandler::getAllAccounts)
+                                .GET(baseUrl.concat(id), accountHandler::findAccountByAccountNumber)
                                 .GET("/api/v1/number", accountHandler::numbers)
                                 //.GET(baseUrl.concat(id), accountHandler::checkIfNumberExists)
                                // .POST(baseUrl, accountHandler::addNumbers)

@@ -26,6 +26,14 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     }
 
     @Override
+    public Mono<Account> findAccountByAccountNumber(String accountNumber) {
+        System.out.println("Request received from router to service to adapter");
+        return accountRepository.findByAccountNumber(accountNumber)
+                .map(ac -> new Account(ac.getId(), ac.getAccountNumber(), ac.getBalance()))
+                .log();
+    }
+
+    @Override
     public Mono<BigDecimal> checkBalance(String accountNumber) {
         return null;
     }

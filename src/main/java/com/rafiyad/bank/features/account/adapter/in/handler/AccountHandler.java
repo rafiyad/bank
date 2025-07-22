@@ -27,6 +27,15 @@ public class AccountHandler {
         );
     }
 
+    public Mono<ServerResponse> findAccountByAccountNumber(ServerRequest serverRequest) {
+        String accountNumber = serverRequest.pathVariable("accountNumber");
+        System.out.println("Request received from router:");
+        return accountUseCase.findAccountByAccountNumber(accountNumber)
+                .flatMap(item -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(item));
+    }
+
 
     public Mono<ServerResponse> numbers(ServerRequest serverRequest) {
         return accountUseCase.getNumbers()

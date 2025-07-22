@@ -14,6 +14,7 @@ public interface AccountUseCase {
     Mono<AccountResponseDto> numbersFind(Integer id);
     Mono<AccountResponseDto> addNumber(RequestDto requestDto);
     Flux<AccountResponseDto> findAllAccounts();
+    Mono<AccountResponseDto> findAccountByAccountNumber(String accountNumber);
     Mono<BigDecimal> checkBalance();
     Mono<Account> createAccount(Account account);
     Mono<BigDecimal> addBalance(Account account, BigDecimal amount);

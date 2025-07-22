@@ -83,7 +83,17 @@ public class AccountService implements AccountUseCase {
                         .builder()
                         .accountNumber(i.getAccountNumber())
                         .balance(i.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP))
-                        .build()));
+                        .build()))
+                .onErrorResume(e -> e.getMessage()==null, e-> Mono.empty());
+                //.onErrorResume(e-> Mono.empty());
+                //.onErrorResume(WebClientException.class, e-> Mono.empty());
+    }
+
+    @Override
+    public Mono<AccountResponseDto> findAccountByAccountNumber(String accountNumber) {
+        System.out.println("Request received from router to Service:");
+        return accountPersistencePort.findAccountByAccountNumber(accountNumber)
+                .map(ac -> new AccountResponseDto(ac.getAccountNumber(), ac.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP)));
     }
 
     @Override

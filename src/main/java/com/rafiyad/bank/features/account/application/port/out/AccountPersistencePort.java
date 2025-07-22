@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 
 public interface AccountPersistencePort {
     Flux<Account> findAllAccounts();
+    Mono<Account> findAccountByAccountNumber(String accountNumber);
     Mono<BigDecimal> checkBalance(String accountNumber);
     Mono<Account> createAccount(Account account);
     Mono<BigDecimal> addBalance(Account account, BigDecimal amount);
