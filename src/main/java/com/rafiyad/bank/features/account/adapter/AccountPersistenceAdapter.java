@@ -22,15 +22,16 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     @Override
     public Flux<Account> findAllAccounts() {
         return accountRepository.findAll().map(ac ->
-                new Account(ac.getId(), ac.getAccountNumber(), ac.getBalance()));
+                new Account(ac.getId(), ac.getAccountNumber(), ac.getBalance()))
+                .doOnError(throwable -> System.out.println("Error occurred at adapter " + throwable.getMessage()));
     }
 
     @Override
     public Mono<Account> findAccountByAccountNumber(String accountNumber) {
-        System.out.println("Request received from router to service to adapter");
+       // System.out.println("Request received from router to service to adapter");
         return accountRepository.findByAccountNumber(accountNumber)
                 .map(ac -> new Account(ac.getId(), ac.getAccountNumber(), ac.getBalance()))
-                .log();
+                .doOnError(throwable -> System.out.println("Error occurred at while getting " +accountNumber + " " + throwable.getMessage()));
     }
 
     @Override

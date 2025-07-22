@@ -7,6 +7,7 @@ import com.rafiyad.bank.features.account.application.port.in.dto.response.Accoun
 import com.rafiyad.bank.features.account.application.port.out.AccountPersistencePort;
 import com.rafiyad.bank.features.account.domain.Account;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -84,16 +85,19 @@ public class AccountService implements AccountUseCase {
                         .accountNumber(i.getAccountNumber())
                         .balance(i.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP))
                         .build()))
-                .onErrorResume(e -> e.getMessage()==null, e-> Mono.empty());
+                //.onErrorResume(e -> e.getMessage()==null, e-> Mono.empty());
                 //.onErrorResume(e-> Mono.empty());
-                //.onErrorResume(WebClientException.class, e-> Mono.empty());
+                .onErrorResume(WebClientException.class, e-> Mono.empty())
+                .switchIfEmpty(Mono.error(new Exception("No data found")));
     }
 
     @Override
     public Mono<AccountResponseDto> findAccountByAccountNumber(String accountNumber) {
-        System.out.println("Request received from router to Service:");
+        //System.out.println("Request received from router to Service:");
         return accountPersistencePort.findAccountByAccountNumber(accountNumber)
-                .map(ac -> new AccountResponseDto(ac.getAccountNumber(), ac.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP)));
+                .map(ac -> new AccountResponseDto(ac.getAccountNumber(), ac.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP)))
+                .doOnError(throwable -> System.out.println("Error occurred at while getting " +accountNumber + " " + throwable.getMessage()))
+                .switchIfEmpty(Mono.error(new Exception("No data found with "+ accountNumber)));
     }
 
     @Override
