@@ -5,13 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseDto {
-    private String message;
-    private List<Integer> data;
+public class AccountResponseDto {
+    private String accountNumber;
+    private BigDecimal balance;
 }

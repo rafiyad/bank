@@ -3,21 +3,26 @@ package com.rafiyad.bank.features.account.application.service;
 
 import com.rafiyad.bank.features.account.application.port.in.AccountUseCase;
 import com.rafiyad.bank.features.account.application.port.in.dto.request.RequestDto;
-import com.rafiyad.bank.features.account.application.port.in.dto.response.ResponseDto;
+import com.rafiyad.bank.features.account.application.port.in.dto.response.AccountResponseDto;
+import com.rafiyad.bank.features.account.application.port.out.AccountPersistencePort;
 import com.rafiyad.bank.features.account.domain.Account;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class AccountService implements AccountUseCase {
+    private final AccountPersistencePort accountPersistencePort;
 
-    Flux<Integer> originalFlux = Flux.range(1, 10);
+    public AccountService(AccountPersistencePort accountPersistencePort) {
+        this.accountPersistencePort = accountPersistencePort;
+    }
 
-    @Override
+   // Flux<Integer> originalFlux = Flux.range(1, 10);
+
+/*    @Override
     public Mono<ResponseDto> getNumbers() {
         return originalFlux
                 .collectList()
@@ -25,9 +30,9 @@ public class AccountService implements AccountUseCase {
                         .message("Numbers fetched successfully")
                         .data(integers)
                         .build());
-    }
+    }*/
 
-    @Override
+   /* @Override
     public Mono<ResponseDto> numbersFind(Integer id) {
         return originalFlux
                 .filter(i -> i.equals(id))
@@ -41,9 +46,9 @@ public class AccountService implements AccountUseCase {
                         .message("Not found")
                         .data(List.of(-1))
                         .build());
-    }
+    }*/
 
-    @Override
+   /* @Override
     public Mono<ResponseDto> addNumber(RequestDto requestDto) {
         Flux<Integer> newFlux = Flux.fromIterable(requestDto.getData());
         return originalFlux
@@ -54,11 +59,31 @@ public class AccountService implements AccountUseCase {
                             .message("Number added successfully")
                             .data(allNumber)
                             .build());
+    }*/
+
+    @Override
+    public Mono<AccountResponseDto> getNumbers() {
+        return null;
     }
 
     @Override
-    public Flux<Account> findAllAccounts() {
+    public Mono<AccountResponseDto> numbersFind(Integer id) {
         return null;
+    }
+
+    @Override
+    public Mono<AccountResponseDto> addNumber(RequestDto requestDto) {
+        return null;
+    }
+
+    @Override
+    public Flux<AccountResponseDto> findAllAccounts() {
+        return accountPersistencePort.findAllAccounts().flatMap(i ->
+                Mono.just(AccountResponseDto
+                        .builder()
+                        .accountNumber(i.getAccountNumber())
+                        .balance(i.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP))
+                        .build()));
     }
 
     @Override
