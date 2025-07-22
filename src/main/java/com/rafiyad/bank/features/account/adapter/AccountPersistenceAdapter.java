@@ -1,8 +1,6 @@
 package com.rafiyad.bank.features.account.adapter;
 
-import com.rafiyad.bank.features.account.adapter.out.entity.AccountEntity;
 import com.rafiyad.bank.features.account.adapter.out.repository.AccountRepository;
-import com.rafiyad.bank.features.account.application.port.in.dto.response.AccountResponseDto;
 import com.rafiyad.bank.features.account.application.port.out.AccountPersistencePort;
 import com.rafiyad.bank.features.account.domain.Account;
 import lombok.Builder;
