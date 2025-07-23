@@ -33,6 +33,16 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Jakarta Validation API
+	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
+	// Hibernate Validator (implementation of Jakarta Validation)
+	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+
+	// Optional: Needed if you're using Spring Boot + WebFlux
+	implementation 'org.glassfish:jakarta.el:4.0.2' // Required for Hibernate Validator to resolve expressions
+
 }
 
 tasks.named('test') {

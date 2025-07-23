@@ -19,6 +19,7 @@ public class AccountRouter {
                         builder -> builder
                                 .GET(baseUrl, accountHandler::getAllAccounts)
                                 .GET(baseUrl.concat(id), accountHandler::findAccountByAccountNumber)
+                                .POST(baseUrl, accountHandler::createAccount)
                                 .GET("/api/v1/number", accountHandler::numbers)
                                 //.GET(baseUrl.concat(id), accountHandler::checkIfNumberExists)
                                // .POST(baseUrl, accountHandler::addNumbers)

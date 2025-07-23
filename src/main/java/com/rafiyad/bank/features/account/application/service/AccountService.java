@@ -2,23 +2,27 @@ package com.rafiyad.bank.features.account.application.service;
 
 
 import com.rafiyad.bank.features.account.application.port.in.AccountUseCase;
-import com.rafiyad.bank.features.account.application.port.in.dto.request.RequestDto;
+import com.rafiyad.bank.features.account.application.port.in.dto.request.AccountRequestDto;
 import com.rafiyad.bank.features.account.application.port.in.dto.response.AccountResponseDto;
 import com.rafiyad.bank.features.account.application.port.out.AccountPersistencePort;
 import com.rafiyad.bank.features.account.domain.Account;
+import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 public class AccountService implements AccountUseCase {
     private final AccountPersistencePort accountPersistencePort;
+    private final MappingContext mappingContext;
 
-    public AccountService(AccountPersistencePort accountPersistencePort) {
+    public AccountService(AccountPersistencePort accountPersistencePort, MappingContext mappingContext) {
         this.accountPersistencePort = accountPersistencePort;
+        this.mappingContext = mappingContext;
     }
 
    // Flux<Integer> originalFlux = Flux.range(1, 10);
@@ -73,7 +77,7 @@ public class AccountService implements AccountUseCase {
     }
 
     @Override
-    public Mono<AccountResponseDto> addNumber(RequestDto requestDto) {
+    public Mono<AccountResponseDto> addNumber(AccountRequestDto accountRequestDto) {
         return null;
     }
 
@@ -106,8 +110,22 @@ public class AccountService implements AccountUseCase {
     }
 
     @Override
-    public Mono<Account> createAccount(Account account) {
-        return null;
+    public Mono<AccountResponseDto> createAccount(AccountRequestDto accountRequestDto) {
+        //Converting the RequestDto to Domain
+        Account account = Account
+                .builder()
+                .id(UUID.randomUUID().toString())
+                .accountNumber(UUID.randomUUID().toString())
+                .balance(BigDecimal.ZERO)
+                .accountType(accountRequestDto.getAccountType())
+                .bankName(accountRequestDto.getBankName())
+                .build();
+
+
+        return accountPersistencePort
+                .createAccount(account) // Converting the domain to responseDto
+                .map(ac -> new AccountResponseDto(ac.getAccountNumber(), ac.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP)));
+
     }
 
     @Override

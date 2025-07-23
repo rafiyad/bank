@@ -5,15 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class RequestDto {
-    private String message;
-    private List<Integer> data;
+public class AccountRequestDto {
+
+    private String mobileNumber;
+    private String email;
+    private String accountType;
+    private String bankName;
+    private String city;
+    private String searchKey;
+
 }

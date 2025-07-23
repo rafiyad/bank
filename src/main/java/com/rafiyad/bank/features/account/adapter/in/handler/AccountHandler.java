@@ -1,28 +1,24 @@
 package com.rafiyad.bank.features.account.adapter.in.handler;
 
 
-import ch.qos.logback.core.net.SocketConnector;
-import com.rafiyad.bank.core.ExceptionHandlerUtil;
 import com.rafiyad.bank.features.account.application.port.in.AccountUseCase;
-import com.rafiyad.bank.features.account.application.port.in.dto.request.RequestDto;
-import com.rafiyad.bank.features.account.domain.Account;
+import com.rafiyad.bank.features.account.application.port.in.dto.request.AccountRequestDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ErrorHandler;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.ExecutionException;
-
 @Component
 public class AccountHandler {
     private final AccountUseCase accountUseCase;
+    private final WebClient.Builder builder;
 
-    public AccountHandler(AccountUseCase accountUseCase) {
+    public AccountHandler(AccountUseCase accountUseCase, WebClient.Builder builder) {
         this.accountUseCase = accountUseCase;
+        this.builder = builder;
     }
 
     public Mono<ServerResponse> getAllAccounts (ServerRequest serverRequest){
@@ -55,13 +51,32 @@ public class AccountHandler {
                 });
     }
 
-
     public Mono<ServerResponse> numbers(ServerRequest serverRequest) {
         return accountUseCase.getNumbers()
                 .flatMap(responseDto ->
                         ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(responseDto));
+    }
+
+    public Mono<ServerResponse> createAccount(ServerRequest serverRequest){
+        Mono<AccountRequestDto> requestDtoMono = serverRequest.bodyToMono(AccountRequestDto.class);
+        //Extract the data from body
+        //send the Dto to service
+        // Service will convert the Dto to domain
+        // Adapter will convert the domain to Entity
+        String searchKey = serverRequest.queryParam("qr").orElse("");
+            return requestDtoMono
+                    .map(accountRequestDto -> {
+                        accountRequestDto.setSearchKey(searchKey);
+                        return accountRequestDto;
+                    })
+                    .flatMap(accountRequestDto -> accountUseCase.createAccount(accountRequestDto))
+                    .flatMap(res ->
+                            ServerResponse.ok()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .bodyValue(res));
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.rafiyad.bank.features.account.adapter;
 
+import com.rafiyad.bank.features.account.adapter.out.entity.AccountEntity;
 import com.rafiyad.bank.features.account.adapter.out.repository.AccountRepository;
 import com.rafiyad.bank.features.account.application.port.out.AccountPersistencePort;
 import com.rafiyad.bank.features.account.domain.Account;
@@ -21,8 +22,13 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
 
     @Override
     public Flux<Account> findAllAccounts() {
-        return accountRepository.findAll().map(ac ->
-                new Account(ac.getId(), ac.getAccountNumber(), ac.getBalance()))
+        return accountRepository.findAll().map(ac -> Account.builder()
+                .id(ac.getId())
+                .accountNumber(ac.getAccountNumber())
+                .balance(ac.getBalance())
+                .accountType(ac.getAccountType())
+                .bankName(ac.getBankName())
+                .build())
                 .doOnError(throwable -> System.out.println("Error occurred at adapter " + throwable.getMessage()));
     }
 
@@ -30,7 +36,12 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     public Mono<Account> findAccountByAccountNumber(String accountNumber) {
        // System.out.println("Request received from router to service to adapter");
         return accountRepository.findByAccountNumber(accountNumber)
-                .map(ac -> new Account(ac.getId(), ac.getAccountNumber(), ac.getBalance()))
+                .map(ac -> Account.builder()
+                        .accountNumber(ac.getAccountNumber())
+                        .balance(ac.getBalance())
+                        .accountType(ac.getAccountType())
+                        .bankName(ac.getBankName())
+                        .build())
                 .doOnError(throwable -> System.out.println("Error occurred at while getting " +accountNumber + " " + throwable.getMessage()));
     }
 
@@ -41,13 +52,32 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
 
     @Override
     public Mono<Account> createAccount(Account account) {
-        return null;
+        //Convert the Domain to Entity
+        AccountEntity entity =AccountEntity
+                .builder()
+                .id(account.getId())
+                .accountNumber(account.getAccountNumber())
+                .balance(account.getBalance())
+                .accountType(account.getAccountType())
+                .bankName(account.getBankName())
+                .build();
+
+        return accountRepository.save(entity)
+                .map(ac -> Account
+                        .builder()
+                        .id(ac.getId())
+                        .accountNumber(ac.getAccountNumber())
+                        .balance(ac.getBalance())
+                        .accountType(ac.getAccountType())
+                        .bankName(ac.getBankName())
+                        .build());
     }
 
     @Override
     public Mono<BigDecimal> addBalance(Account account, BigDecimal amount) {
         return null;
     }
+
 
     //Convert Entity to Domain
 
