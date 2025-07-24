@@ -1,4 +1,4 @@
-package com.rafiyad.bank.core;
+package com.rafiyad.bank.core.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

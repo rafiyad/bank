@@ -6,16 +6,21 @@ import com.rafiyad.bank.features.account.application.port.in.dto.request.Account
 import com.rafiyad.bank.features.account.application.port.in.dto.response.AccountResponseDto;
 import com.rafiyad.bank.features.account.application.port.out.AccountPersistencePort;
 import com.rafiyad.bank.features.account.domain.Account;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.Random;
 import java.util.UUID;
 
+@Slf4j
 @Service
+@Transactional
 public class AccountService implements AccountUseCase {
     private final AccountPersistencePort accountPersistencePort;
     private final MappingContext mappingContext;
@@ -112,24 +117,39 @@ public class AccountService implements AccountUseCase {
     @Override
     public Mono<AccountResponseDto> createAccount(AccountRequestDto accountRequestDto) {
         //Converting the RequestDto to Domain
+
+        log.info("Create account method called in service before save");
         Account account = Account
                 .builder()
-                .id(UUID.randomUUID().toString())
-                .accountNumber(UUID.randomUUID().toString())
+                .id(accountRequestDto.getMobileNumber())
+                .accountNumber(generateAccountNumber())
+                .mobileNumber(accountRequestDto.getMobileNumber())
+                .email(accountRequestDto.getEmail())
                 .balance(BigDecimal.ZERO)
                 .accountType(accountRequestDto.getAccountType())
                 .bankName(accountRequestDto.getBankName())
                 .build();
 
+        System.out.println(account.toString());
 
-        return accountPersistencePort
+        return accountPersistencePort //check if the account is existing or not
                 .createAccount(account) // Converting the domain to responseDto
-                .map(ac -> new AccountResponseDto(ac.getAccountNumber(), ac.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP)));
-
+                .map(ac -> AccountResponseDto
+                        .builder()
+                        .accountNumber(ac.getAccountNumber())
+                        .balance(ac.getBalance().setScale(2, BigDecimal.ROUND_HALF_UP))
+                        .build())
+                .switchIfEmpty(Mono.error(new Exception("No data found")));
     }
 
     @Override
     public Mono<BigDecimal> addBalance(Account account, BigDecimal amount) {
         return null;
+    }
+
+    private static String generateAccountNumber() {
+        long timestamp = System.currentTimeMillis(); // 13 digits
+        int random = new Random().nextInt(10);       // 0–9 → 1 digit
+        return String.format("%013d%d", timestamp, random); // total 14 digits
     }
 }

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -14,7 +16,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 @Table(name = "account")
-public class AccountEntity {
+public class AccountEntity implements Persistable<String> {
     @Id
     private String id;
 
@@ -38,4 +40,14 @@ public class AccountEntity {
 
     @NotNull
     private String bankName;
+
+
+    @Transient
+    private boolean isNewRecord;
+
+
+    @Override
+    public boolean isNew() {
+     return this.isNewRecord || id == null;
+    }
 }
