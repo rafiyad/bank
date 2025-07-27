@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 @Builder
 @Table(name = "account")
 public class AccountEntity implements Persistable<String> {
+    // Persistable is added for forcing the id to be created by application not by the database
+
     @Id
     private String id;
 
@@ -41,7 +43,7 @@ public class AccountEntity implements Persistable<String> {
     @NotNull
     private String bankName;
 
-
+    // This is flag has to be true inorder to save the ID
     @Transient
     private boolean isNewRecord;
 

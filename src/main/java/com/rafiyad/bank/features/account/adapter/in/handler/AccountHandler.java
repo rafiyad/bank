@@ -16,11 +16,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class AccountHandler {
     private final AccountUseCase accountUseCase;
-    private final WebClient.Builder builder;
 
-    public AccountHandler(AccountUseCase accountUseCase, WebClient.Builder builder) {
+
+    public AccountHandler(AccountUseCase accountUseCase) {
         this.accountUseCase = accountUseCase;
-        this.builder = builder;
     }
 
     public Mono<ServerResponse> getAllAccounts (ServerRequest serverRequest){
@@ -80,6 +79,38 @@ public class AccountHandler {
                             ServerResponse.ok()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(res));
+    }
+    public Mono<ServerResponse> updateAccount(ServerRequest serverRequest){
+        String accountNumber = serverRequest.pathVariable("accountNumber");
+        Mono<AccountRequestDto> requestDtoMono = serverRequest.bodyToMono(AccountRequestDto.class);
+
+        return requestDtoMono.flatMap(requestDto ->
+                accountUseCase.updateAccountByMobileNumber(accountNumber, requestDto)
+                        .flatMap(res -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(res))
+                        .onErrorResume(throwable -> {
+                            System.out.println("Error occurred while updating account: "+ throwable.getMessage());
+                            return ServerResponse.status(HttpStatus.NOT_FOUND)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .bodyValue("Something went wrong with account you are looking for" + throwable.getMessage());
+                        }));
+    }
+
+
+    public Mono<ServerResponse> deleteAccount(ServerRequest serverRequest){
+        String accountNumber = serverRequest.pathVariable("accountNumber");
+        String mobileNumber = serverRequest.pathVariable("mobileNumber");
+        return accountUseCase.deleteAccountByAccountNumber(accountNumber, mobileNumber).flatMap(item ->
+                ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue("Account deleted successfully")
+        ).onErrorResume(throwable -> {
+            System.out.println("Error occurred while updating accounts: " + throwable.getMessage());
+            return ServerResponse.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("Something went wrong with account you are looking for" + throwable.getMessage());
+        });
     }
 
 }

@@ -16,18 +16,15 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.Random;
-import java.util.UUID;
+
 
 @Slf4j
 @Service
-@Transactional
 public class AccountService implements AccountUseCase {
     private final AccountPersistencePort accountPersistencePort;
-    private final MappingContext mappingContext;
-
-    public AccountService(AccountPersistencePort accountPersistencePort, MappingContext mappingContext) {
+    
+    public AccountService(AccountPersistencePort accountPersistencePort) {
         this.accountPersistencePort = accountPersistencePort;
-        this.mappingContext = mappingContext;
     }
 
    // Flux<Integer> originalFlux = Flux.range(1, 10);
@@ -143,13 +140,33 @@ public class AccountService implements AccountUseCase {
     }
 
     @Override
+    public Mono<AccountResponseDto> updateAccountByMobileNumber(String mobileNumber, AccountRequestDto accountRequestDto) {
+        return null;
+    }
+
+    @Override
     public Mono<BigDecimal> addBalance(Account account, BigDecimal amount) {
         return null;
     }
+
+    @Override
+    public Mono<AccountResponseDto> deleteAccountByAccountNumber(String accountNumber, String mobileNumber) {
+         //System.out.println("Request received from router to Service:");
+        // Check if the account is exist and if don't
+        return accountPersistencePort.deleteAccountByAccountNumber(accountNumber)
+                .doOnError(throwable -> System.out.println("Error occurred at while getting " +accountNumber + " " + throwable.getMessage()))
+                .switchIfEmpty(Mono.error(new Exception("No data found with "+ accountNumber)))
+                .then(Mono.empty());
+    };
 
     private static String generateAccountNumber() {
         long timestamp = System.currentTimeMillis(); // 13 digits
         int random = new Random().nextInt(10);       // 0–9 → 1 digit
         return String.format("%013d%d", timestamp, random); // total 14 digits
     }
+
+
+
 }
+
+

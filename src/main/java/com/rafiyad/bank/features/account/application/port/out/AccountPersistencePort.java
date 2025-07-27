@@ -14,4 +14,6 @@ public interface AccountPersistencePort {
     Mono<BigDecimal> checkBalance(String accountNumber);
     Mono<Account> createAccount(Account account);
     Mono<BigDecimal> addBalance(Account account, BigDecimal amount);
+
+    Mono<Void> deleteAccountByAccountNumber(String accountNumber);
 }

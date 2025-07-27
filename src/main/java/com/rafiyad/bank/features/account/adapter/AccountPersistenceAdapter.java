@@ -68,7 +68,8 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
                 .bankName(account.getBankName())
                 .build();
 
-        entity.setNewRecord(true); // Use the new setter
+        // This is enabling the mobile number to saved in the database.
+        entity.setNewRecord(true); 
 
         System.out.println(entity.toString());
 
@@ -91,6 +92,11 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     @Override
     public Mono<BigDecimal> addBalance(Account account, BigDecimal amount) {
         return null;
+    }
+
+    @Override
+    public Mono<Void> deleteAccountByAccountNumber(String accountNumber) {
+        return accountRepository.deleteByAccountNumber(accountNumber);
     }
 
 

@@ -17,6 +17,8 @@ public interface AccountUseCase {
     Mono<AccountResponseDto> findAccountByAccountNumber(String accountNumber);
     Mono<BigDecimal> checkBalance();
     Mono<AccountResponseDto> createAccount(AccountRequestDto accountRequestDto);
+    Mono<AccountResponseDto> updateAccountByMobileNumber(String mobileNumber, AccountRequestDto accountRequestDto);
     Mono<BigDecimal> addBalance(Account account, BigDecimal amount);
+    Mono<AccountResponseDto> deleteAccountByAccountNumber(String accountNumber, String mobileNumber);
 
 }

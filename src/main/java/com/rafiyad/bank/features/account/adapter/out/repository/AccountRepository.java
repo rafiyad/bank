@@ -12,6 +12,9 @@ public interface AccountRepository extends ReactiveCrudRepository<AccountEntity,
     @Query("SELECT * FROM account WHERE account_number = :accountNumber")
     Mono<AccountEntity> findByAccountNumber(String accountNumber);
 
+    Mono<Void> deleteByAccountNumber(String accountNumber);
+
+
 
 
 
