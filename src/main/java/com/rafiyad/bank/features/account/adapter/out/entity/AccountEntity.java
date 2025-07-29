@@ -17,7 +17,14 @@ import java.math.BigDecimal;
 @Builder
 @Table(name = "account")
 public class AccountEntity implements Persistable<String> {
-    // Persistable is added for forcing the id to be created by application not by the database
+    // Persistable is added for forcing the id to be created by application, not by the database
+    /*
+    Spring Data provides the org.springframework.data.domain.Persistable<ID> interface.
+    Implementing this interface allows entities to explicitly define their identity (getId())
+    and whether they are new or already persisted (isNew()). This can be particularly useful
+    for optimizing save operations, as it can help Spring Data determine whether to perform
+    an INSERT or an UPDATE without necessarily querying the database first.
+    */
 
     @Id
     private String id;
@@ -25,6 +32,9 @@ public class AccountEntity implements Persistable<String> {
     @NotNull
     @UniqueElements
     private String accountNumber;
+
+    @NotNull
+    private BigDecimal balance;
 
     @NotNull
     @UniqueElements
@@ -35,13 +45,13 @@ public class AccountEntity implements Persistable<String> {
     private String email;
 
     @NotNull
-    private BigDecimal balance;
-
-    @NotNull
     private String accountType;
 
     @NotNull
     private String bankName;
+
+    @NotNull
+    private String branchName;
 
     // This is flag has to be true inorder to save the ID
     @Transient

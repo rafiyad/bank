@@ -10,15 +10,12 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 
 public interface AccountUseCase {
-    Mono<AccountResponseDto> getNumbers();
-    Mono<AccountResponseDto> numbersFind(Integer id);
-    Mono<AccountResponseDto> addNumber(AccountRequestDto accountRequestDto);
     Flux<AccountResponseDto> findAllAccounts();
     Mono<AccountResponseDto> findAccountByAccountNumber(String accountNumber);
-    Mono<BigDecimal> checkBalance();
     Mono<AccountResponseDto> createAccount(AccountRequestDto accountRequestDto);
-    Mono<AccountResponseDto> updateAccountByMobileNumber(String mobileNumber, AccountRequestDto accountRequestDto);
-    Mono<BigDecimal> addBalance(Account account, BigDecimal amount);
     Mono<AccountResponseDto> deleteAccountByAccountNumber(String accountNumber, String mobileNumber);
+    Mono<AccountResponseDto> updateAccountByMobileNumber(String accountNumber, AccountRequestDto accountRequestDto);
+    Mono<BigDecimal> checkBalance();
+    Mono<BigDecimal> addBalance(Account account, BigDecimal amount);
 
 }

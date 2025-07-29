@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 public interface AccountPersistencePort {
     Flux<Account> findAllAccounts();
     Mono<Account> findAccountByAccountNumber(String accountNumber);
-    Mono<BigDecimal> checkBalance(String accountNumber);
     Mono<Account> createAccount(Account account);
-    Mono<BigDecimal> addBalance(Account account, BigDecimal amount);
-
+    Mono<Account> updateAccount(String accountNumber, Account account);
     Mono<Void> deleteAccountByAccountNumber(String accountNumber);
+    Mono<BigDecimal> checkBalance(String accountNumber);
+    Mono<BigDecimal> addBalance(Account account, BigDecimal amount);
 }

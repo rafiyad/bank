@@ -16,6 +16,7 @@ public class AccountRequestDto {
     private String mobileNumber;
     private String email;
     private String accountType;
+    private String branchName;
     private String bankName;
     private String city;
     private String searchKey;

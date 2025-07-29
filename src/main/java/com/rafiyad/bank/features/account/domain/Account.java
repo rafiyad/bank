@@ -16,6 +16,7 @@ public class Account {
     private String email;
     private BigDecimal balance;
     private String accountType;
+    private String branchName;
     private String bankName;
 
 

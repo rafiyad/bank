@@ -15,7 +15,4 @@ public interface AccountRepository extends ReactiveCrudRepository<AccountEntity,
     Mono<Void> deleteByAccountNumber(String accountNumber);
 
 
-
-
-
 }

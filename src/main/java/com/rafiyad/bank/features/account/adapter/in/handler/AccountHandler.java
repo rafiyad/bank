@@ -3,114 +3,56 @@ package com.rafiyad.bank.features.account.adapter.in.handler;
 
 import com.rafiyad.bank.features.account.application.port.in.AccountUseCase;
 import com.rafiyad.bank.features.account.application.port.in.dto.request.AccountRequestDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AccountHandler {
+
     private final AccountUseCase accountUseCase;
 
-
-    public AccountHandler(AccountUseCase accountUseCase) {
-        this.accountUseCase = accountUseCase;
-    }
-
-    public Mono<ServerResponse> getAllAccounts (ServerRequest serverRequest){
-        //ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(accountUseCase.findAllAccounts(), Account.class);
-        return accountUseCase.findAllAccounts().collectList()
-                .flatMap(item ->
-                ServerResponse.ok()
+    public Mono<ServerResponse> getAllAccounts(ServerRequest serverRequest) {
+        log.info("getAllAccounts called from accountHandler");
+        return accountUseCase.findAllAccounts().collectList().flatMap(
+                ac-> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(item))
-                .onErrorResume(throwable -> {
-                    System.out.println("Error occurred while getting accounts: " + throwable.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue("Something went wrong" + throwable.getMessage());
-                });
+                        .bodyValue(ac));
     }
 
-    public Mono<ServerResponse> findAccountByAccountNumber(ServerRequest serverRequest) {
+    public Mono<ServerResponse> findAccountByAccountNumber (ServerRequest serverRequest) {
+        log.info("findAccountByAccountNumber called from accountHandler");
         String accountNumber = serverRequest.pathVariable("accountNumber");
-        //System.out.println("Request received from router:");
-        return accountUseCase.findAccountByAccountNumber(accountNumber)
-                .flatMap(item -> ServerResponse.ok()
+
+        return accountUseCase.findAccountByAccountNumber(accountNumber).flatMap(
+                ac -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(item))
-                .onErrorResume(throwable -> {
-                    System.out.println("Error occurred while getting accounts: " + throwable.getMessage());
-                    return ServerResponse.status(HttpStatus.NOT_FOUND)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue("Something went wrong with account you are looking for" + throwable.getMessage());
-                });
-    }
-
-    public Mono<ServerResponse> numbers(ServerRequest serverRequest) {
-        return accountUseCase.getNumbers()
-                .flatMap(responseDto ->
-                        ServerResponse.ok()
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(responseDto));
-    }
-
-    public Mono<ServerResponse> createAccount(ServerRequest serverRequest){
-        log.info("Create account method called");
-        Mono<AccountRequestDto> requestDtoMono = serverRequest.bodyToMono(AccountRequestDto.class);
-        //Extract the data from body
-        //send the Dto to service
-        // Service will convert the Dto to domain
-        // Adapter will convert the domain to Entity
-        String searchKey = serverRequest.queryParam("qr").orElse("");
-        System.out.println("Handler Called");
-            return requestDtoMono
-                    .map(accountRequestDto -> {
-                        accountRequestDto.setSearchKey(searchKey);
-                        return accountRequestDto;
-                    })
-                    .flatMap(accountRequestDto -> accountUseCase.createAccount(accountRequestDto))
-                    .flatMap(res ->
-                            ServerResponse.ok()
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .bodyValue(res));
-    }
-    public Mono<ServerResponse> updateAccount(ServerRequest serverRequest){
-        String accountNumber = serverRequest.pathVariable("accountNumber");
-        Mono<AccountRequestDto> requestDtoMono = serverRequest.bodyToMono(AccountRequestDto.class);
-
-        return requestDtoMono.flatMap(requestDto ->
-                accountUseCase.updateAccountByMobileNumber(accountNumber, requestDto)
-                        .flatMap(res -> ServerResponse.ok()
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(res))
-                        .onErrorResume(throwable -> {
-                            System.out.println("Error occurred while updating account: "+ throwable.getMessage());
-                            return ServerResponse.status(HttpStatus.NOT_FOUND)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .bodyValue("Something went wrong with account you are looking for" + throwable.getMessage());
-                        }));
-    }
-
-
-    public Mono<ServerResponse> deleteAccount(ServerRequest serverRequest){
-        String accountNumber = serverRequest.pathVariable("accountNumber");
-        String mobileNumber = serverRequest.pathVariable("mobileNumber");
-        return accountUseCase.deleteAccountByAccountNumber(accountNumber, mobileNumber).flatMap(item ->
-                ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue("Account deleted successfully")
-        ).onErrorResume(throwable -> {
-            System.out.println("Error occurred while updating accounts: " + throwable.getMessage());
+                        .bodyValue(ac))
+                /*.onErrorResume(i -> {
             return ServerResponse.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue("Something went wrong with account you are looking for" + throwable.getMessage());
-        });
+                    .bodyValue("Account not found with accountNumber: " + accountNumber);
+        })*/
+        ;
     }
+    public Mono<ServerResponse> createAccount (ServerRequest serverRequest) {
+        //Mono<AccountRequestDto> accountRequestDto = serverRequest.bodyToMono(AccountRequestDto.class);
+        return serverRequest.bodyToMono(AccountRequestDto.class)
+                .flatMap(requestDto -> {
+                    log.info("Received account creation request: {}", requestDto);
+                    return accountUseCase.createAccount(requestDto).flatMap(
+                            ac -> ServerResponse.ok()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .bodyValue(ac));
+                });
+    }
+
 
 }

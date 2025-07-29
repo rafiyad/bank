@@ -14,4 +14,7 @@ import java.math.BigDecimal;
 public class AccountResponseDto {
     private String accountNumber;
     private BigDecimal balance;
+    private String accountType;
+    private String branchName;
+    private String bankName;
 }
