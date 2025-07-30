@@ -68,7 +68,13 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
                 .accountType(account.getAccountType())
                 .bankName(account.getBankName())
                 .branchName(account.getBranchName())
+                .isNewRecord(true)
                 .build();
+
+        // This is enabling the mobile number to save in the database.
+
+
+        System.out.println("Received in Service and converted to domain to entity" + accountEntity.toString());
 
         return accountRepository.save(accountEntity).map(
                 acE -> Account

@@ -48,7 +48,7 @@ public class AccountHandler {
                 .flatMap(requestDto -> {
                     log.info("Received account creation request: {}", requestDto);
                     return accountUseCase.createAccount(requestDto).flatMap(
-                            ac -> ServerResponse.ok()
+                            ac -> ServerResponse.status(HttpStatus.CREATED)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(ac));
                 });

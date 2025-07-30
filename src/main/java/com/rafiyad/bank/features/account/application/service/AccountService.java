@@ -74,7 +74,6 @@ public class AccountService implements AccountUseCase {
     public Mono<AccountResponseDto> createAccount(AccountRequestDto accountRequestDto) {
 
         // Check if the account already exists or not if yes through an exception
-
         Account account = Account
                 .builder()
                 .id(generateRandomAccountId())
@@ -87,6 +86,7 @@ public class AccountService implements AccountUseCase {
                 .bankName(accountRequestDto.getBankName())
                 .build();
 
+        System.out.println("Received in Service and converted to Dto to domain" + account.toString());
         return accountPersistencePort.createAccount(account).map(
                 ac -> AccountResponseDto
                         .builder()
